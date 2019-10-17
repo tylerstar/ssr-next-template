@@ -1,4 +1,4 @@
-const getHost = (req: { headers: { host: string } }): string => {
+export default (req: { headers: { host: string } }): string => {
   if (!req) return ''
 
   const { host } = req.headers;
@@ -9,4 +9,3 @@ const getHost = (req: { headers: { host: string } }): string => {
   return `https://${host}`
 }
 
-export default getHost
