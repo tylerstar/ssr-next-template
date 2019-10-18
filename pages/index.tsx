@@ -1,9 +1,11 @@
 import React from 'react'
-import { initialiseStore, IStore } from "../stores/store";
+import Link from 'next/link'
 import { observer } from 'mobx-react'
+import { initialiseStore, IStore } from "../stores/store";
+import { getIsServer } from "../utils/host";
 
 const App: React.FC = () => {
-  const isServer: boolean = typeof window === 'undefined'
+  const isServer: boolean = getIsServer()
   const store: (IStore | null) = initialiseStore(isServer)
 
   const add = () => {
@@ -18,6 +20,11 @@ const App: React.FC = () => {
       <button onClick={add}>
         Add
       </button>
+      <div>
+        <Link href='/login'>
+          Login now
+        </Link>
+      </div>
     </div>
   );
 }
