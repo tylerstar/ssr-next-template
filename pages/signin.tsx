@@ -11,7 +11,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
-import { validateEmail, validatePassword } from "../utils/validation"
+import { validateEmail } from "../src/utils/validation"
 
 const useStyles = makeStyles(({ palette, spacing } : Theme) => createStyles({
   '@global': {
@@ -38,31 +38,28 @@ const useStyles = makeStyles(({ palette, spacing } : Theme) => createStyles({
   },
 }))
 
-const LoginPage = (props: any) => {
+const LoginPage = () => {
   const [email, setEmail]                     = useState<string>('')
   const [password, setPassword]               = useState<string>('')
-  const [passwordConfirm, setPasswordConfirm] = useState<string>('')
+  const [isRemember, setIsRemember]           = useState<boolean>(false)
   const [errors, setErrors]                   = useState<string[]>([])
+  const classes                               = useStyles()
 
   const handleOnSubmit = (event: FormEvent) => {
     event.preventDefault()
 
     const isEmailValid = validateEmail(email)
-    if (!isEmailValid) {
-      setErrors(['Invalid email', ...errors])
+    if (isEmailValid) {
+      setErrors(['Invalid email format', ...errors])
+
+      // TODO!!! Red the text field if error happen over there
+      // TODO!!! Add Message box to display error messages
     }
 
-    const isPasswordValid = validatePassword(password)
-    if (!isPasswordValid) {
-      setErrors(['Invalid password', ...errors])
-    }
-
-    if (password !== passwordConfirm) {
-      setErrors(['Passwords mismatched', ...errors])
-    }
+    console.log(email)
+    console.log(password)
+    console.log(isRemember)
   }
-
-  const classes = useStyles()
 
   return (
     <Container component='main' maxWidth='xs'>
@@ -85,6 +82,7 @@ const LoginPage = (props: any) => {
             name="email"
             autoComplete="email"
             autoFocus
+            onChange={event => setEmail(event.target.value)}
           />
           <TextField
             variant="outlined"
@@ -96,10 +94,13 @@ const LoginPage = (props: any) => {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={event => setPassword(event.target.value)}
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
+            checked={isRemember}
+            onChange={() => setIsRemember(!isRemember)}
           />
           <Button
             type="submit"
@@ -117,7 +118,7 @@ const LoginPage = (props: any) => {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link href="/signup" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
