@@ -1,6 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-import { observer } from 'mobx-react'
 import CalculatorComponent from '../src/components/calculator'
 
 const App: React.FC = () => {
@@ -8,7 +7,7 @@ const App: React.FC = () => {
     <div>
       <div>
         <Link href='/signin'>
-          Login now
+          <a>Login now</a>
         </Link>
       </div>
       <CalculatorComponent/>
