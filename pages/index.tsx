@@ -1,8 +1,23 @@
 import React from 'react'
 import Link from 'next/link'
+import { API, graphqlOperation } from 'aws-amplify'
+
 import CalculatorComponent from '../src/components/calculator'
+import { listBlogs } from "../src/graphql/queries";
+import config from '../src/aws-exports'
+
+API.configure(config)
 
 const App: React.FC = () => {
+  const fetchBlogs = async () => {
+    return await API.graphql(graphqlOperation(listBlogs, {}))
+  }
+
+  fetchBlogs()
+    .then(resp => {
+      console.log(resp)
+    })
+
   return (
     <div>
       <div>
@@ -11,6 +26,8 @@ const App: React.FC = () => {
         </Link>
       </div>
       <CalculatorComponent/>
+      <div>
+      </div>
     </div>
   );
 }
