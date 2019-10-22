@@ -18,23 +18,27 @@ export const login = ({ accessToken, idToken, refreshToken }: ITokens) => {
 };
 
 export const auth = (ctx: NextPageContext) => {
-  const { token } = nextCookie(ctx)
+  const { accessToken } = nextCookie(ctx)
 
-  if (ctx.res && !token) {
-    ctx.res.writeHead(302, '/login')
+  if (ctx.res && !accessToken) {
+    console.log("1")
+    ctx.res.writeHead(302, { Location: '/signin' })
     ctx.res.end()
   }
 
-  if (!token) {
-    Router.push('/login').then(() => null)
+  if (!accessToken) {
+    console.log("2")
+    Router.push('/signin')
   }
 
-  return token
+  return accessToken
 }
 
 export const logout = () => {
-  cookie.remove('token')
-  window.localStorage.setItem('logout', String(Date.now()))
+  cookie.remove('accessToken')
+  cookie.remove('idToken')
+  cookie.remove('refreshToken')
+  window.localStorage.setItem('signout', String(Date.now()))
   Router.push('/login').then(() => null)
 }
 
@@ -42,7 +46,7 @@ export const withAuthSync = (WrappedComponent: NextPage): React.FC => {
   const Wrapper = (props: object) => {
     const syncLogout = (event: StorageEvent) => {
       if (event.key === 'logout') {
-        Router.push('/login').then(() => null)
+        Router.push('/signin')
       }
     }
 
@@ -51,21 +55,22 @@ export const withAuthSync = (WrappedComponent: NextPage): React.FC => {
 
       return () => {
         window.removeEventListener('storage', syncLogout)
-        window.localStorage.removeItem('logout')
+        window.localStorage.removeItem('signout')
       }
     }, [null])
 
     return <WrappedComponent {...props} />
   }
 
-  Wrapper.getInitialProps = async (ctx: NextPageContext) => {
-    const token = auth(ctx)
+  Wrapper.getInitialProps = async (ctx: any) => {
+    console.log(Object.keys(ctx))
+    const accessToken = auth(ctx)
 
     const componentProps =
       WrappedComponent.getInitialProps &&
       (await WrappedComponent.getInitialProps(ctx))
 
-    return { ...componentProps, token }
+    return { ...componentProps, accessToken }
   }
 
   return Wrapper

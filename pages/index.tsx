@@ -5,6 +5,7 @@ import { API, graphqlOperation } from 'aws-amplify'
 import CalculatorComponent from '../src/components/calculator'
 import { listBlogs } from "../src/graphql/queries";
 import config from '../src/aws-exports'
+import { withAuthSync } from "../src/utils/auth";
 
 API.configure(config)
 
@@ -32,4 +33,4 @@ const App: React.FC = () => {
   )
 }
 
-export default App
+export default withAuthSync(App)
