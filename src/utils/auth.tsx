@@ -4,12 +4,16 @@ import nextCookie from 'next-cookies'
 import cookie from 'js-cookie'
 import { NextPage, NextPageContext } from "next";
 
-interface LoginFunction {
-  token: string
+interface ITokens {
+  accessToken: string,
+  idToken: string,
+  refreshToken: string
 }
 
-export const login = ({ token }: LoginFunction) => {
-  cookie.set('token', token, { expires: 1 })
+export const login = ({ accessToken, idToken, refreshToken }: ITokens) => {
+  cookie.set('accessToken', accessToken, { expires: 1 })
+  cookie.set('idToken', idToken, { expires: 1 })
+  cookie.set('refreshToken', refreshToken, { expires: 1 })
   Router.push('/').then(() => null)
 };
 

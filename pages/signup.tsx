@@ -1,4 +1,4 @@
-import React, {FormEvent, useState} from 'react'
+import React, { FormEvent, useState } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -10,6 +10,11 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import { validateEmail } from "../src/utils/validation"
+import Amplify, { Auth } from 'aws-amplify'
+import ConfirmComponent from '../src/components/auth/confirm'
+import awsconfig from '../src/aws-exports'
+
+Amplify.configure(awsconfig)
 
 const useStyles = makeStyles(({ palette, spacing } : Theme) => createStyles({
   '@global': {
@@ -37,10 +42,12 @@ const useStyles = makeStyles(({ palette, spacing } : Theme) => createStyles({
 }))
 
 const SignUpPage = () => {
+  const [username, setUsername]                   = useState<string>('')
   const [email, setEmail]                         = useState<string>('')
   const [password, setPassword]                   = useState<string>('')
   const [confirmedPassword, setConfirmedPassword] = useState<string>('')
   const [errors, setErrors]                       = useState<string[]>([])
+  const [isConfirm, setIsConfirm]                 = useState<boolean>(false)
   const classes                                   = useStyles()
 
   const handleOnSubmit = (event: FormEvent) => {
@@ -54,22 +61,40 @@ const SignUpPage = () => {
       // TODO!!! Add Message box to display error messages
     }
 
-    console.log(email)
-    console.log(password)
-    console.log(confirmedPassword)
+    Auth.signUp({
+      username: email,
+      password
+    })
+      .then(data => {
+        console.log(data)
+        setIsConfirm(true)
+      })
+      .catch(err => console.error(err))
   }
 
   return (
     <Container component='main' maxWidth='xs'>
-      <CssBaseline />
-      <div className={classes.paper}>
+      <CssBaseline/>
+      { !isConfirm ? <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          <LockOutlinedIcon/>
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
         <form className={classes.form} noValidate onSubmit={handleOnSubmit}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            onChange={event => setUsername(event.target.value)}
+          />
           <TextField
             variant="outlined"
             margin="normal"
@@ -123,7 +148,7 @@ const SignUpPage = () => {
             </Grid>
           </Grid>
         </form>
-      </div>
+      </div> : <ConfirmComponent username={email} />}
     </Container>
   )
 }

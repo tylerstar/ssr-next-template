@@ -12,6 +12,12 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import { validateEmail } from "../src/utils/validation"
+import Amplify, { Auth } from 'aws-amplify'
+import awsconfig from '../src/aws-exports'
+import { login } from "../src/utils/auth";
+import ConfirmComponent from '../src/components/auth/confirm'
+
+Amplify.configure(awsconfig)
 
 const useStyles = makeStyles(({ palette, spacing } : Theme) => createStyles({
   '@global': {
@@ -43,9 +49,10 @@ const LoginPage = () => {
   const [password, setPassword]               = useState<string>('')
   const [isRemember, setIsRemember]           = useState<boolean>(false)
   const [errors, setErrors]                   = useState<string[]>([])
+  const [isConfirm, setIsConfirm]             = useState<boolean>(false)
   const classes                               = useStyles()
 
-  const handleOnSubmit = (event: FormEvent) => {
+  const handleOnSubmit = async (event: FormEvent) => {
     event.preventDefault()
 
     const isEmailValid = validateEmail(email)
@@ -59,6 +66,21 @@ const LoginPage = () => {
     console.log(email)
     console.log(password)
     console.log(isRemember)
+
+    const user = await Auth.signIn(email, password)
+    console.log(user)
+
+    const userSession = user.signInUserSession
+    const accessToken = userSession.accessToken.jwtToken
+    const idToken = userSession.idToken.jwtToken
+    const refreshToken = userSession.refreshToken.token
+
+    const tokens = {
+      accessToken,
+      idToken,
+      refreshToken
+    }
+    login(tokens)
   }
 
   return (
